@@ -10,22 +10,23 @@ using BookMovie.Models;
 
 namespace BookMovie.Controllers
 {
-    public class RegistersController : Controller
+    public class TheatresController : Controller
     {
         private readonly ApplicationDbContext _context;
-        
-        public RegistersController(ApplicationDbContext context)
+
+        public TheatresController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Registers
+        // GET: Theatres
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Registers.ToListAsync());
+            var applicationDbContext = _context.Theatres.Include(t => t.Movie);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Registers/Details/5
+        // GET: Theatres/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +34,42 @@ namespace BookMovie.Controllers
                 return NotFound();
             }
 
-            var register = await _context.Registers
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (register == null)
+            var theatre = await _context.Theatres
+                .Include(t => t.Movie)
+                .FirstOrDefaultAsync(m => m.TheatreId == id);
+            if (theatre == null)
             {
                 return NotFound();
             }
 
-            return View(register);
+            return View(theatre);
         }
 
-        // GET: Registers/Create
+        // GET: Theatres/Create
         public IActionResult Create()
         {
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieName");
             return View();
         }
 
-        // POST: Registers/Create
+        // POST: Theatres/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,FirstName,LastName,Email,Password")] Register register)
+        public async Task<IActionResult> Create([Bind("TheatreId,TheatreName,TheatreAddress,TheatreOwnerName,NoOfSeats,MovieId")] Theatre theatre)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(register);
+                _context.Add(theatre);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(register);
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieName", theatre.MovieId);
+            return View(theatre);
         }
 
-        // GET: Registers/Edit/5
+        // GET: Theatres/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +77,23 @@ namespace BookMovie.Controllers
                 return NotFound();
             }
 
-            var register = await _context.Registers.FindAsync(id);
-            if (register == null)
+            var theatre = await _context.Theatres.FindAsync(id);
+            if (theatre == null)
             {
                 return NotFound();
             }
-            return View(register);
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieName", theatre.MovieId);
+            return View(theatre);
         }
 
-        // POST: Registers/Edit/5
+        // POST: Theatres/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,FirstName,LastName,Email,Password")] Register register)
+        public async Task<IActionResult> Edit(int id, [Bind("TheatreId,TheatreName,TheatreAddress,TheatreOwnerName,NoOfSeats,MovieId")] Theatre theatre)
         {
-            if (id != register.UserId)
+            if (id != theatre.TheatreId)
             {
                 return NotFound();
             }
@@ -97,12 +102,12 @@ namespace BookMovie.Controllers
             {
                 try
                 {
-                    _context.Update(register);
+                    _context.Update(theatre);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RegisterExists(register.UserId))
+                    if (!TheatreExists(theatre.TheatreId))
                     {
                         return NotFound();
                     }
@@ -113,10 +118,11 @@ namespace BookMovie.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(register);
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieName", theatre.MovieId);
+            return View(theatre);
         }
 
-        // GET: Registers/Delete/5
+        // GET: Theatres/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +130,35 @@ namespace BookMovie.Controllers
                 return NotFound();
             }
 
-            var register = await _context.Registers
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (register == null)
+            var theatre = await _context.Theatres
+                .Include(t => t.Movie)
+                .FirstOrDefaultAsync(m => m.TheatreId == id);
+            if (theatre == null)
             {
                 return NotFound();
             }
 
-            return View(register);
+            return View(theatre);
         }
 
-        // POST: Registers/Delete/5
+        // POST: Theatres/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var register = await _context.Registers.FindAsync(id);
-            if (register != null)
+            var theatre = await _context.Theatres.FindAsync(id);
+            if (theatre != null)
             {
-                _context.Registers.Remove(register);
+                _context.Theatres.Remove(theatre);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool RegisterExists(int id)
+        private bool TheatreExists(int id)
         {
-            return _context.Registers.Any(e => e.UserId == id);
+            return _context.Theatres.Any(e => e.TheatreId == id);
         }
     }
 }

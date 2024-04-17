@@ -10,22 +10,47 @@ using BookMovie.Models;
 
 namespace BookMovie.Controllers
 {
-    public class RegistersController : Controller
+    public class MoviesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        
-        public RegistersController(ApplicationDbContext context)
+
+        public MoviesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Registers
+        // GET: Movies
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Registers.ToListAsync());
+            return View(await _context.Movies.ToListAsync());
+        }
+  
+        //GET:Movies/SearchByCategory
+        public async Task<IActionResult> SearchByCategory(String Category)
+        {
+            
+            return View(await _context.Movies.Where(m=>m.MovieCategory==Category).ToListAsync());
         }
 
-        // GET: Registers/Details/5
+      //  var movies = from m in _context.Movie
+                   //  where m.Genre == category
+                    // select m;
+
+  //  return View(await movies.ToListAsync());
+
+
+        //GET: Movies/SearchAllMovie
+        public async Task<IActionResult> SearchAllMovie()
+        {
+
+            return View(await _context.Movies.ToListAsync());
+        }
+
+
+        //viewbag, viewdata,tempdata,session - values can be transferred from once action method to another or one controller to another
+        //html helpers
+
+        // GET: Movies/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +58,39 @@ namespace BookMovie.Controllers
                 return NotFound();
             }
 
-            var register = await _context.Registers
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (register == null)
+            var movie = await _context.Movies
+                .FirstOrDefaultAsync(m => m.MovieId == id);
+            if (movie == null)
             {
                 return NotFound();
             }
 
-            return View(register);
+            return View(movie);
         }
 
-        // GET: Registers/Create
+        // GET: Movies/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Registers/Create
+        // POST: Movies/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,FirstName,LastName,Email,Password")] Register register)
+        public async Task<IActionResult> Create([Bind("MovieId,MovieName,MovieDescription,MovieCategory,MovieDuration,ImageURL")] Movie movie)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(register);
+                _context.Add(movie);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(register);
+            return View(movie);
         }
 
-        // GET: Registers/Edit/5
+        // GET: Movies/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +98,22 @@ namespace BookMovie.Controllers
                 return NotFound();
             }
 
-            var register = await _context.Registers.FindAsync(id);
-            if (register == null)
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie == null)
             {
                 return NotFound();
             }
-            return View(register);
+            return View(movie);
         }
 
-        // POST: Registers/Edit/5
+        // POST: Movies/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,FirstName,LastName,Email,Password")] Register register)
+        public async Task<IActionResult> Edit(int id, [Bind("MovieId,MovieName,MovieDescription,MovieCategory,MovieDuration,ImageURL")] Movie movie)
         {
-            if (id != register.UserId)
+            if (id != movie.MovieId)
             {
                 return NotFound();
             }
@@ -97,12 +122,12 @@ namespace BookMovie.Controllers
             {
                 try
                 {
-                    _context.Update(register);
+                    _context.Update(movie);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RegisterExists(register.UserId))
+                    if (!MovieExists(movie.MovieId))
                     {
                         return NotFound();
                     }
@@ -113,10 +138,10 @@ namespace BookMovie.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(register);
+            return View(movie);
         }
 
-        // GET: Registers/Delete/5
+        // GET: Movies/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +149,34 @@ namespace BookMovie.Controllers
                 return NotFound();
             }
 
-            var register = await _context.Registers
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (register == null)
+            var movie = await _context.Movies
+                .FirstOrDefaultAsync(m => m.MovieId == id);
+            if (movie == null)
             {
                 return NotFound();
             }
 
-            return View(register);
+            return View(movie);
         }
 
-        // POST: Registers/Delete/5
+        // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var register = await _context.Registers.FindAsync(id);
-            if (register != null)
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie != null)
             {
-                _context.Registers.Remove(register);
+                _context.Movies.Remove(movie);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool RegisterExists(int id)
+        private bool MovieExists(int id)
         {
-            return _context.Registers.Any(e => e.UserId == id);
+            return _context.Movies.Any(e => e.MovieId == id);
         }
     }
 }

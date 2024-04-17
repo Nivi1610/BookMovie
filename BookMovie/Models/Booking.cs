@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookMovie.Models
 {
@@ -6,9 +7,20 @@ namespace BookMovie.Models
     {
         [Key]
         public int BookingId { get; set; }
-        public Register UserId { get; set; }
-        public Movie MovieName { get; set; }
+        public int UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual Register Register { get; set; }
+        public int ScheduleId { get; set; }
+        [ForeignKey("ScheduleId")]
+        public virtual Schedule Schedule { get; set; }
         public int NoOfSeats { get; set; }
-        public int NoOfItems { get; set; }
+        public double PricePerSeat { get; set; }
+        public string Snacks { get; set; }
+        public double SnacksPrice { get; set; }
+        public double TotalAmount { get; set; }
+      
+        public virtual Payment Payment { get; set; }
+
+       
     }
 }
